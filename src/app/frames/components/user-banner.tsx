@@ -48,7 +48,7 @@ const UserBanner: React.FC<UserBannerProps> = ({
       <img
         src={`${user.pfp}`}
         alt={`${user.displayName} profile image`}
-        tw="w-[78px] h-[78px] rounded-full"
+        tw="w-[60px] h-[60px] rounded-full"
       />
       <p tw="m-0 p-0 ml-[20px]">
         {user.displayName && user.displayName?.length > MAX_DISPLAY_NAME_LENGTH
