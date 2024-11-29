@@ -34,7 +34,7 @@ export default async function TokenPage({
   const token = await getTokenFromAddress(getAddress(address));
 
   return (
-    <div className="p-4 bg-slate-200 rounded-xl w-full">
+    <div className="p-4 w-full">
       <TokenDetails token={token} />
     </div>
   );
