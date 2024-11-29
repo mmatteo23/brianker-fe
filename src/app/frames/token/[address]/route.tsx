@@ -13,7 +13,6 @@ import { BackgroundImage } from "@/app/frames/components/background-image";
 import { getTokenFromAddress } from "@/utils/db";
 
 import { getAddress, isAddress } from "viem";
-import { getUserDataForFid } from "frames.js";
 
 function truncate(text: string, max: number) {
   return text.slice(0, max - 1) + (text.length > max ? "..." : "");
@@ -32,7 +31,12 @@ const frameHandler = frames(async (ctx) => {
     if (!token) {
       throw new Error("Token not found");
     }
-    const requestor = await getUserDataForFid({ fid: token.requestedBy });
+    const requestor = JSON.parse(token.requestedBy) as {
+      fid: number;
+      username: string;
+      displayName: string;
+      profileImage: string;
+    };
     return {
       image: (
         <BackgroundImage
@@ -82,8 +86,7 @@ const frameHandler = frames(async (ctx) => {
                   <UserBanner
                     user={{
                       displayName: truncate(
-                        `@${requestor?.username}` ||
-                          token.requestedBy.toString(),
+                        `@${requestor?.username}` || requestor?.fid.toString(),
                         15
                       ),
                       pfp: requestor?.profileImage || "",
