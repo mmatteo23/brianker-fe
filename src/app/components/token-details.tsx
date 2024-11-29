@@ -1,41 +1,21 @@
-"use client";
-
 import { Token } from "@/utils/schemas/db.schema";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
-export const TokenDetails = () => {
-  const pathname = usePathname();
-  const tokenAddress = pathname.split("/").pop();
+import Image from "next/image";
 
-  const [token, setToken] = useState<Token | undefined>(undefined);
-
-  if (!tokenAddress) {
-    return <div>Token not found</div>;
-  }
-
-  useEffect(() => {
-    async function getTokenFromDb(tokenAddress: string) {
-      const tokenResult = await fetch(`/api/token?address=${tokenAddress}`);
-      const { data: token } = await tokenResult.json();
-      setToken(token);
-    }
-    if (tokenAddress) {
-      getTokenFromDb(tokenAddress);
-    }
-  }, [tokenAddress]);
-
+export const TokenDetails = ({ token }: { token: Token | undefined }) => {
   return (
     <>
       {token && (
         <div className="flex flex-col-reverse md:flex-row w-full gap-2">
           <div className="flex flex-col gap-2 bg-slate-400 p-2 rounded-xl w-full md:w-[60%]">
             <div className="flex flex-row gap-2">
-              <img
-                src={`/images/copy.png`}
-                alt={token.name}
-                className="w-[60px] h-[60px] rounded-lg"
+              <Image
+                src={token.image || `/images/copy.png`}
+                alt={`${token.name} logo`}
+                className="w-[60px] h-[60px] rounded-lg object-contain"
+                width={60}
+                height={60}
               />
               <div className="flex flex-col">
                 <p className="text-xl font-bold">{token.ticker}</p>

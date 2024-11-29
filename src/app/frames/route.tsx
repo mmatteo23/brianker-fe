@@ -4,12 +4,6 @@ import { frames } from "./frames";
 import { appURL } from "../utils";
 
 const frameHandler = frames(async (ctx) => {
-  const counter = ctx.message
-    ? ctx.searchParams.op === "+"
-      ? ctx.state.counter + 1
-      : ctx.state.counter - 1
-    : ctx.state.counter;
-
   return {
     image: (
       <div tw="flex flex-col">
@@ -17,12 +11,6 @@ const frameHandler = frames(async (ctx) => {
       </div>
     ),
     buttons: [
-      <Button action="post" target={{ pathname: "/", query: { op: "+" } }}>
-        Increment
-      </Button>,
-      <Button action="post" target={{ pathname: "/", query: { op: "-" } }}>
-        Decrement
-      </Button>,
       <Button action="link" target={appURL()}>
         External
       </Button>,
@@ -30,7 +18,6 @@ const frameHandler = frames(async (ctx) => {
         Token
       </Button>,
     ],
-    state: { counter: counter },
   };
 });
 
