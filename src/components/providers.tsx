@@ -5,43 +5,40 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { wagmiConfig } from "@/utils/wagmi";
-import { sepolia } from "viem/chains";
+import { baseSepolia, mainnet } from "viem/chains";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 const queryClient = new QueryClient();
 
 const privyConfig: PrivyClientConfig = {
-  embeddedWallets: {
-    createOnLogin: "all-users",
-  },
-  loginMethods: ["email", "google", "farcaster", "wallet"],
+  loginMethods: ["wallet"],
   appearance: {
     theme: "light",
     accentColor: "#676FFF",
     showWalletLoginFirst: true,
   },
-  defaultChain: sepolia,
-  supportedChains: [sepolia],
+  defaultChain: baseSepolia,
+  supportedChains: [baseSepolia, mainnet],
 };
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <PrivyProvider appId="cm1ursrn606y7c56nfnh2j8oi" config={privyConfig}>
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={wagmiConfig}>
-          <NextThemesProvider
-            attribute="class"
-            defaultTheme="light"
-            // enableSystem
-            disableTransitionOnChange
-          >
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="light"
+      disableTransitionOnChange
+      enableColorScheme={false}
+    >
+      <PrivyProvider appId="cm4342c9g0b4913p8n08eiswg" config={privyConfig}>
+        <QueryClientProvider client={queryClient}>
+          <WagmiProvider config={wagmiConfig}>
             {children}
             <Toaster />
-          </NextThemesProvider>
-        </WagmiProvider>
-      </QueryClientProvider>
-    </PrivyProvider>
+          </WagmiProvider>
+        </QueryClientProvider>
+      </PrivyProvider>
+    </NextThemesProvider>
   );
 };
 

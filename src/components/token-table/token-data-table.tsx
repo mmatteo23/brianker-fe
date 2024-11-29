@@ -141,7 +141,7 @@ export function TokenDataTable<TData, TValue>({
                   onClick={() => {
                     console.log(JSON.stringify(row, null, 2));
                     window.location.href = `/token/${
-                      (row.original as any).address
+                      (row.original as { address: string }).address
                     }`;
                   }}
                 >
@@ -173,26 +173,28 @@ export function TokenDataTable<TData, TValue>({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Select
-                      value={`${table.getState().pagination.pageSize}`}
-                      onValueChange={(value) => {
-                        table.setPageSize(Number(value));
-                      }}
-                      defaultValue={defaultPageSize.toString()}
-                    >
-                      <SelectTrigger className="h-8 w-[70px] rounded-xl">
-                        <SelectValue
-                          placeholder={table.getState().pagination.pageSize}
-                        />
-                      </SelectTrigger>
-                      <SelectContent side="top">
-                        {[4, 10, 20, 30, 40, 50].map((pageSize) => (
-                          <SelectItem key={pageSize} value={`${pageSize}`}>
-                            {pageSize}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div>
+                      <Select
+                        value={`${table.getState().pagination.pageSize}`}
+                        onValueChange={(value) => {
+                          table.setPageSize(Number(value));
+                        }}
+                        defaultValue={defaultPageSize.toString()}
+                      >
+                        <SelectTrigger className="h-8 w-[70px] rounded-xl">
+                          <SelectValue
+                            placeholder={table.getState().pagination.pageSize}
+                          />
+                        </SelectTrigger>
+                        <SelectContent side="top">
+                          {[4, 10, 20, 30, 40, 50].map((pageSize) => (
+                            <SelectItem key={pageSize} value={`${pageSize}`}>
+                              {pageSize}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Rows per page</p>
