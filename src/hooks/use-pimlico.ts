@@ -1,14 +1,14 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWallets } from "@privy-io/react-auth";
-import { sepolia } from "viem/chains"; // Replace this with the chain used by your application
+import { sepolia } from "viem/chains";
 import { http } from "viem";
 import { createSmartAccountClient, SmartAccountClient } from "permissionless";
 import { toSimpleSmartAccount } from "permissionless/accounts";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetActiveWallet } from "@privy-io/wagmi";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { pimlicoClient, pimlicoRpcUrl } from "@/lib/pimlico";
+import { pimlicoClient, pimlicoRpcUrl } from "@/utils/pimlico";
 import { entryPoint07Address } from "viem/account-abstraction";
 
 export default function usePimlico() {
@@ -22,7 +22,7 @@ export default function usePimlico() {
 
   const embeddedWallet = useMemo(
     () => wallets.find((wallet) => wallet.walletClientType === "privy"),
-    [wallets]
+    [wallets],
   );
 
   const fetchPimlicoSmartAccount = useCallback(async () => {

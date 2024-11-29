@@ -4,7 +4,7 @@ import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
-import { wagmiConfig } from "@/lib/wagmi";
+import { wagmiConfig } from "@/utils/wagmi";
 import { sepolia } from "viem/chains";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
