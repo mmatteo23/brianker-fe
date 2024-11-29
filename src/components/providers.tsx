@@ -15,7 +15,7 @@ const privyConfig: PrivyClientConfig = {
   embeddedWallets: {
     createOnLogin: "all-users",
   },
-  loginMethods: ["email", "google", "farcaster"],
+  loginMethods: ["email", "google", "farcaster", "wallet"],
   appearance: {
     theme: "light",
     accentColor: "#676FFF",
