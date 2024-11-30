@@ -4,24 +4,27 @@ import { usePrivy } from "@privy-io/react-auth";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useAccount, useSwitchChain } from "wagmi";
-import { baseSepolia, mainnet } from "wagmi/chains";
+import {
+  useAccount,
+  // useSwitchChain
+} from "wagmi";
+// import { baseSepolia, mainnet } from "wagmi/chains";
 
 import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
   const { user, authenticated, login, logout } = usePrivy();
   const { chain } = useAccount();
-  const { switchChain } = useSwitchChain();
+  // const { switchChain } = useSwitchChain();
   const address = user?.wallet?.address;
 
-  const handleSwitchChain = () => {
-    if (chain?.id !== mainnet.id) {
-      switchChain({ chainId: mainnet.id });
-    } else {
-      switchChain({ chainId: baseSepolia.id });
-    }
-  };
+  // const handleSwitchChain = () => {
+  //   if (chain?.id !== mainnet.id) {
+  //     switchChain({ chainId: mainnet.id });
+  //   } else {
+  //     switchChain({ chainId: baseSepolia.id });
+  //   }
+  // };
 
   return (
     <nav className="flex justify-between items-center p-4">
@@ -43,7 +46,7 @@ export const Navbar = () => {
             <span>{`${address?.slice(0, 4)}...${address?.slice(-4)}`}</span>
             <span>{chain?.name}</span>
             <Button onClick={logout}>Logout</Button>
-            <Button onClick={handleSwitchChain}>Switch Chain</Button>
+            {/* <Button onClick={handleSwitchChain}>Switch Chain</Button> */}
           </div>
         ) : (
           <Button onClick={login}>Login</Button>

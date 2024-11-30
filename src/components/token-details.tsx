@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { usePrivy } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains";
-import { formatUnits, parseEther } from "viem";
+import { formatUnits, getAddress, parseEther } from "viem";
 import {
   useAccount,
   useReadContract,
@@ -81,7 +81,7 @@ export const TokenDetails = ({
 }: {
   token: TokenWithRequestor | undefined;
 }) => {
-  const { authenticated, login, logout } = usePrivy();
+  const { authenticated, login } = usePrivy();
   const { address } = useAccount();
   const [zeroForOne, setZeroForOne] = useState<boolean>(true);
   const [inputPrice, setInputPrice] = useState<string>("0");
@@ -91,6 +91,10 @@ export const TokenDetails = ({
   const [allowance, setAllowance] = useState("0");
   const [isLoading, setIsLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<TransactionStatus>(null);
+
+  console.log({
+    token,
+  });
 
   const {
     data: swapTxHash,
@@ -137,6 +141,12 @@ export const TokenDetails = ({
     args: [address as `0x${string}`, SwapRouterAddress as `0x${string}`],
   });
 
+  console.log({
+    ethBalance,
+    tokenBalance,
+    allowanceResult,
+  });
+
   // Handle transaction status updates
   useEffect(() => {
     if (isApprovePending || isSwapPending) {
@@ -163,7 +173,7 @@ export const TokenDetails = ({
 
   // Handle automatic swap after approval
   useEffect(() => {
-    if (isApproveConfirmed) {
+    if (isApproveConfirmed && token) {
       const params: SwapParams = {
         zeroForOne: false,
         amountSpecified: BigInt(-parsedInput),
@@ -182,8 +192,7 @@ export const TokenDetails = ({
         args: [
           {
             currency0: "0x0000000000000000000000000000000000000000",
-            currency1:
-              "0xA788b3D74CE0125263BDaF4Ebe726dd78FE54954" as `0x${string}`,
+            currency1: token.address as `0x${string}`,
             fee: 3000,
             tickSpacing: 60,
             hooks: "0x50e8CED6ca2FA2840827b7DcC748C775277a48C0",
@@ -196,7 +205,7 @@ export const TokenDetails = ({
         account: address,
       });
     }
-  }, [isApproveConfirmed]);
+  }, [address, isApproveConfirmed, parsedInput, swap, token]);
 
   // Update allowance when result changes
   useEffect(() => {
@@ -207,10 +216,15 @@ export const TokenDetails = ({
 
   // Update current balance based on selected token
   useEffect(() => {
-    if (zeroForOne && ethBalance) {
-      setCurrentBalance(formatUnits(ethBalance.value, 18));
-    } else if (!zeroForOne && tokenBalance) {
-      setCurrentBalance(formatUnits(tokenBalance as bigint, 18));
+    console.log("getting new balance for", zeroForOne ? "ETH" : token?.ticker);
+    if (zeroForOne) {
+      setCurrentBalance(
+        formatUnits(ethBalance ? ethBalance.value : BigInt(0), 18),
+      );
+    } else {
+      setCurrentBalance(
+        formatUnits(tokenBalance ? BigInt(tokenBalance) : BigInt(0), 18),
+      );
     }
   }, [zeroForOne, ethBalance, tokenBalance]);
 
@@ -237,6 +251,18 @@ export const TokenDetails = ({
     setIsLoading(true);
 
     try {
+      const poolKey = {
+        currency0:
+          "0x0000000000000000000000000000000000000000" as `0x${string}`,
+        currency1: getAddress(token.address),
+        fee: 3000,
+        tickSpacing: 60,
+        hooks: "0x50e8CED6ca2FA2840827b7DcC748C775277a48C0" as `0x${string}`,
+      };
+      const testSettings: TestSettings = {
+        takeClaims: false,
+        settleUsingBurn: false,
+      };
       if (zeroForOne) {
         const params: SwapParams = {
           zeroForOne,
@@ -244,28 +270,11 @@ export const TokenDetails = ({
           sqrtPriceLimitX96: MIN_PRICE_LIMIT,
         };
 
-        const testSettings: TestSettings = {
-          takeClaims: false,
-          settleUsingBurn: false,
-        };
-
-        await swap({
+        swap({
           address: SwapRouterAddress as `0x${string}`,
           abi: SwapRouterABI,
           functionName: "swap",
-          args: [
-            {
-              currency0: "0x0000000000000000000000000000000000000000",
-              currency1:
-                "0xA788b3D74CE0125263BDaF4Ebe726dd78FE54954" as `0x${string}`,
-              fee: 3000,
-              tickSpacing: 60,
-              hooks: "0x50e8CED6ca2FA2840827b7DcC748C775277a48C0",
-            },
-            params,
-            testSettings,
-            "0x",
-          ],
+          args: [poolKey, params, testSettings, "0x"],
           chain: baseSepolia,
           account: address,
           value: BigInt(parsedInput),
@@ -273,8 +282,7 @@ export const TokenDetails = ({
       } else {
         if (BigInt(allowance) < parseEther(inputPrice)) {
           approve({
-            address:
-              "0xA788b3D74CE0125263BDaF4Ebe726dd78FE54954" as `0x${string}`,
+            address: token.address as `0x${string}`,
             abi: ERC20_ABI,
             functionName: "approve",
             args: [SwapRouterAddress, parseEther(inputPrice)],
@@ -286,28 +294,11 @@ export const TokenDetails = ({
             sqrtPriceLimitX96: MAX_PRICE_LIMIT,
           };
 
-          const testSettings: TestSettings = {
-            takeClaims: false,
-            settleUsingBurn: false,
-          };
-
           swap({
             address: SwapRouterAddress as `0x${string}`,
             abi: SwapRouterABI,
             functionName: "swap",
-            args: [
-              {
-                currency0: "0x0000000000000000000000000000000000000000",
-                currency1:
-                  "0xA788b3D74CE0125263BDaF4Ebe726dd78FE54954" as `0x${string}`,
-                fee: 3000,
-                tickSpacing: 60,
-                hooks: "0x50e8CED6ca2FA2840827b7DcC748C775277a48C0",
-              },
-              params,
-              testSettings,
-              "0x",
-            ],
+            args: [poolKey, params, testSettings, "0x"],
             chain: baseSepolia,
             account: address,
           });
@@ -328,6 +319,10 @@ export const TokenDetails = ({
     isApprovePending ||
     isApproveConfirming ||
     !authenticated;
+
+  const isTradingAvailable = token
+    ? new Date(token.dateTime) > new Date(new Date().toUTCString())
+    : false;
 
   return (
     <>
@@ -366,17 +361,30 @@ export const TokenDetails = ({
           <div className="flex gap-2 w-full md:w-[40%] flex-col-reverse md:flex-col">
             {authenticated ? (
               <>
-                <div className="flex flex-col gap-2 bg-slate-400 rounded-xl p-2">
+                {/* <span className="text-black">
+                  {`${new Date(token.dateTime)} > ${new Date(new Date().toUTCString())}`}
+                </span> */}
+                {token?.dateTime && isTradingAvailable && (
+                  <div className="bg-red-500 text-red-200 p-4 rounded-xl mb-2 text-center">
+                    Trading not yet available - opens at{" "}
+                    {new Date(token.dateTime).toLocaleString()}
+                  </div>
+                )}
+                <div
+                  className={`flex flex-col gap-2 bg-gray-900 rounded-xl p-2 ${isTradingAvailable ? "opacity-30" : ""}`}
+                >
                   <div className="flex flex-row gap-2 justify-between h-12">
                     <Button
                       className={`w-1/2 ${zeroForOne ? "bg-blue-600" : "bg-slate-600"}`}
                       onClick={handleBuy}
+                      disabled={isTradingAvailable}
                     >
                       Buy
                     </Button>
                     <Button
                       className={`w-1/2 ${!zeroForOne ? "bg-blue-600" : "bg-slate-600"}`}
                       onClick={handleSell}
+                      disabled={isTradingAvailable}
                     >
                       Sell
                     </Button>
@@ -394,9 +402,10 @@ export const TokenDetails = ({
                           value={inputPrice}
                           onChange={handlePriceChange}
                           className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-1"
+                          disabled={isTradingAvailable}
                         />
-                        <span className="text-sm text-gray-500 pr-3 min-w-[150px] text-right whitespace-nowrap">
-                          Max: {Number(currentBalance).toFixed(4)}{" "}
+                        <span className="text-sm text-gray-500 pr-3 min-w-[200px] text-right whitespace-nowrap">
+                          Balance: {Number(currentBalance).toFixed(4)}{" "}
                           {zeroForOne ? "ETH" : token?.ticker}
                         </span>
                       </div>
@@ -409,7 +418,7 @@ export const TokenDetails = ({
 
                     <Button
                       onClick={handleSwap}
-                      disabled={isSwapDisabled}
+                      disabled={isSwapDisabled || isTradingAvailable}
                       className="w-full mt-2"
                     >
                       {isSwapPending || isSwapConfirming
@@ -417,9 +426,9 @@ export const TokenDetails = ({
                         : "Execute Swap"}
                     </Button>
 
-                    <Button onClick={logout} className="w-full">
+                    {/* <Button onClick={logout} className="w-full">
                       Disconnect Wallet
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </>
@@ -429,7 +438,7 @@ export const TokenDetails = ({
               </Button>
             )}
 
-            <div className="flex flex-col bg-slate-400 rounded-xl p-2">
+            <div className="flex flex-col bg-gray-900 rounded-xl p-2">
               <p className="text-2xl font-bold mb-4">Token Info</p>
               <div className="flex flex-row gap-4 justify-between">
                 <div className="flex flex-col w-1/2">
@@ -499,7 +508,7 @@ export const TokenDetails = ({
           {/* Transaction Status Notification */}
           {txStatus && (
             <div
-              className={`fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 transition-all duration-500`}
+              className={`fixed bottom-4 right-4 bg-black text-white rounded-lg shadow-lg p-4 flex items-center gap-3 transition-all duration-500`}
             >
               {txStatus === "awaiting" && (
                 <>
