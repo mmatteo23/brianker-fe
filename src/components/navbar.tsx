@@ -36,6 +36,18 @@ export const Navbar = () => {
           />
           <span className="text-2xl font-bold">Briannah</span>
         </a>
+      </div>
+      <div className="flex flex-row items-center gap-2">
+        {authenticated ? (
+          <div className="flex items-center gap-2 h-[24px]">
+            <span>{`${address?.slice(0, 4)}...${address?.slice(-4)}`}</span>
+            <span>{chain?.name}</span>
+            <Button onClick={logout}>Logout</Button>
+            <Button onClick={handleSwitchChain}>Switch Chain</Button>
+          </div>
+        ) : (
+          <Button onClick={login}>Login</Button>
+        )}
         <Link
           href="https://warpcast.com/briannah"
           target="_blank"
@@ -49,18 +61,6 @@ export const Navbar = () => {
             className="size-[24px]"
           />
         </Link>
-      </div>
-      <div className="flex items-center gap-2">
-        {authenticated ? (
-          <div className="flex items-center gap-2">
-            <span>{`${address?.slice(0, 4)}...${address?.slice(-4)}`}</span>
-            <span>{chain?.name}</span>
-            <Button onClick={logout}>Logout</Button>
-            <Button onClick={handleSwitchChain}>Switch Chain</Button>
-          </div>
-        ) : (
-          <Button onClick={login}>Login</Button>
-        )}
       </div>
     </nav>
   );

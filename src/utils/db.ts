@@ -19,12 +19,33 @@ export const getTokens = async (limit: number = 10) => {
   const tokens = await db.query.tokenTable.findMany({
     limit,
   });
-  return tokens;
+  // for each token I need to do JSON.parse(token.requestedBy)
+  return tokens.map((token) => {
+    return {
+      ...token,
+      requestedBy: JSON.parse(token.requestedBy) as {
+        fid: number;
+        username: string;
+        displayName: string;
+        profileImage: string;
+      },
+    };
+  });
 };
 
 export const getTokenFromAddress = async (address: string) => {
   const token = await db.query.tokenTable.findFirst({
     where: eq(tokenTable.address, address),
   });
-  return token;
+  return token
+    ? {
+        ...token,
+        requestedBy: JSON.parse(token.requestedBy) as {
+          fid: number;
+          username: string;
+          displayName: string;
+          profileImage: string;
+        },
+      }
+    : undefined;
 };

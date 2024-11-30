@@ -1,11 +1,33 @@
 "use client";
-import { Token } from "@/utils/schemas/db.schema";
 import { Button } from "@/components/ui/button";
 
 import Image from "next/image";
 import { usePrivy } from "@privy-io/react-auth";
+import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 
-export const TokenDetails = ({ token }: { token: Token | undefined }) => {
+type TokenWithRequestor = {
+  id: number;
+  name: string;
+  ticker: string;
+  image: string;
+  requestedBy: {
+    fid: number;
+    username: string;
+    displayName: string;
+    profileImage: string;
+  };
+  address: string;
+  dateTime: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export const TokenDetails = ({
+  token,
+}: {
+  token: TokenWithRequestor | undefined;
+}) => {
   const { authenticated, user, login } = usePrivy();
   console.log({
     authenticated,
@@ -61,25 +83,68 @@ export const TokenDetails = ({ token }: { token: Token | undefined }) => {
               )}
             </div>
             <div className="flex flex-col bg-gray-900 rounded-xl p-2">
-              <p className="text-2xl font-bold mb-4">Token Info</p>
-              <div className="flex flex-row gap-4 justify-between">
+              <p className="text-2xl font-bold my-2 text-center">Token Info</p>
+              <hr className="border-gray-700 mb-4" />
+              <div className="flex flex-row gap-4 justify-between my-4">
                 <div className="flex flex-col w-1/2">
-                  <p className="text-lg">Created at</p>
-                  <p className="text-lg font-bold">{token.createdAt}</p>
+                  <p className="text-lg text-indigo-400 font-bold">Created</p>
+                  {token.createdAt ? (
+                    <div className="flex flex-col">
+                      {`${formatDistanceToNow(new Date(token.createdAt))} ago`}
+                      <span className="text-xs">
+                        {`(${new Date(token.createdAt).toLocaleString()})`}
+                      </span>
+                    </div>
+                  ) : (
+                    "N/A"
+                  )}
                 </div>
                 <div className="flex flex-col w-1/2">
-                  <p className="text-lg">Market Cap</p>
-                  <p className="text-lg font-bold">{"$10.89M"}</p>
+                  <p className="text-lg text-indigo-400 font-bold">Chain</p>
+                  <p className="text-lg flex flex-row gap-2 items-center">
+                    <Image
+                      src="/images/base.png"
+                      alt="Base logo"
+                      width={24}
+                      height={24}
+                      className="w-[24px] h-[24px]"
+                    />
+                    Base Sepolia
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-row gap-4 justify-between">
+              <div className="flex flex-row gap-4 justify-between my-4">
                 <div className="flex flex-col w-1/2">
-                  <p className="text-lg">Chain</p>
-                  <p className="text-lg font-bold">Base</p>
+                  <p className="text-lg text-indigo-400 font-bold">
+                    Requested By
+                  </p>
+                  {token.requestedBy ? (
+                    <Link
+                      href={`https://warpcast.com/${token.requestedBy.username}`}
+                      target="_blank"
+                    >
+                      <div className="flex flex-row">
+                        <Image
+                          src={token.requestedBy.profileImage}
+                          alt={token.requestedBy.username}
+                          width={24}
+                          height={24}
+                          className="w-[24px] h-[24px] rounded-full"
+                        />
+                        <span className="ml-2">
+                          {token.requestedBy.displayName}
+                        </span>
+                      </div>
+                    </Link>
+                  ) : (
+                    "N/A"
+                  )}
                 </div>
                 <div className="flex flex-col w-1/2">
-                  <p className="text-lg">24H VOLUME</p>
-                  <p className="text-lg font-bold">{"$6.76M"}</p>
+                  <p className="text-lg text-indigo-400 font-bold">
+                    Total Supply
+                  </p>
+                  <p className="text-lg">{"$1M"}</p>
                 </div>
               </div>
             </div>
