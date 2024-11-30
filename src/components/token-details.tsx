@@ -62,11 +62,12 @@ import { TokenWithRequestor } from "@/utils/db";
 import { Badge } from "./ui/badge";
 
 function warpcastSharableURL(token: TokenWithRequestor) {
-  let sharableText = `watch this out! This token is so hot 🔥\n\nToken:\n- ${token.ticker} (${token.name})\n- requested by @${token.requestedBy.username}\n${token.createdAt && `- created ${formatDistanceToNow(new Date(token.createdAt))} ago (${new Date(token.createdAt).toLocaleString()})`}\n- tradable from: ${formatDistanceToNow(new Date(token.dateTime))}\n\nmore details here 👇🏼`;
+  const sharableText = `watch this out! This token is so hot 🔥\n\nToken:\n- ${token.ticker} (${token.name})\n- requested by @${token.requestedBy.username}\n${token.createdAt && `- created ${formatDistanceToNow(new Date(token.createdAt))} ago (${new Date(token.createdAt).toLocaleString()})`}\n- tradable from: ${formatDistanceToNow(new Date(token.dateTime))}\n\nmore details here 👇🏼`;
   let sharableTextUriEncoded = "";
   try {
     sharableTextUriEncoded = encodeURI(sharableText);
   } catch (e) {
+    console.error("Error encoding sharable text:", e);
     sharableTextUriEncoded = encodeURI(
       "new token created! check it out on https://brianker.vercel.app",
     );
