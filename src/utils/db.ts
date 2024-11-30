@@ -15,7 +15,26 @@ export const db = drizzle(tursoClient, {
   },
 });
 
-export const getTokens = async (limit: number = 10) => {
+export type TokenWithRequestor = {
+  id: number;
+  name: string;
+  ticker: string;
+  image: string;
+  requestedBy: {
+    fid: number;
+    username: string;
+    displayName: string;
+    profileImage: string;
+  };
+  address: string;
+  dateTime: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export const getTokens = async (
+  limit: number = 10,
+): Promise<TokenWithRequestor[]> => {
   const tokens = await db.query.tokenTable.findMany({
     limit,
   });
@@ -33,7 +52,9 @@ export const getTokens = async (limit: number = 10) => {
   });
 };
 
-export const getTokenFromAddress = async (address: string) => {
+export const getTokenFromAddress = async (
+  address: string,
+): Promise<TokenWithRequestor | undefined> => {
   const token = await db.query.tokenTable.findFirst({
     where: eq(tokenTable.address, address),
   });

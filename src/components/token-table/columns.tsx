@@ -3,16 +3,12 @@
 import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-import { ArrowUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Token } from "@/utils/schemas/db.schema";
+import { TokenWithRequestor } from "@/utils/db";
+import Link from "next/link";
+import { Badge } from "../ui/badge";
+import { formatDistanceToNow } from "date-fns";
 
-export const columns: ColumnDef<
-  Token & {
-    marketCap: number;
-    price: number;
-  }
->[] = [
+export const columns: ColumnDef<TokenWithRequestor>[] = [
   {
     accessorKey: "token",
     header: "Token",
@@ -47,35 +43,52 @@ export const columns: ColumnDef<
     },
   },
   {
-    accessorKey: "marketCap",
-    header: ({ column }) => (
-      <Button
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="rounded-xl text-white"
-      >
-        Market Cap
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    accessorKey: "availableFrom",
+    header: "Available From",
     cell: ({ row }) => (
-      <div className="px-4">
-        $
-        {new Intl.NumberFormat("en-US", {
-          notation: "compact",
-          compactDisplay: "short",
-        }).format(row.original.marketCap)}
+      <div className="flex items-center gap-2 px-4">
+        {row.original.createdAt
+          ? new Date(row.original.dateTime) < new Date(new Date().toUTCString())
+            ? formatDistanceToNow(new Date(row.original.createdAt))
+            : ` ${new Date(row.original.dateTime).toLocaleString()}`
+          : "N/A"}
       </div>
     ),
   },
   {
-    accessorKey: "price",
-    header: "Price",
+    accessorKey: "tradable",
+    header: "Tradable",
     cell: ({ row }) => (
       <div className="flex items-center gap-2 px-4">
-        {new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(row.original.price)}
+        {new Date(row.original.dateTime) <
+        new Date(new Date().toUTCString()) ? (
+          <Badge className="bg-green-500">Tradable</Badge>
+        ) : (
+          <Badge className="bg-red-500">Not Tradable</Badge>
+        )}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "requestedBy",
+    header: "Requested By",
+    cell: ({ row }) => (
+      <div className="px-4">
+        <Link
+          href={`https://warpcast.com/${row.original.requestedBy.username}`}
+          target="_blank"
+        >
+          <div className="flex flex-row">
+            <Image
+              src={row.original.requestedBy.profileImage}
+              alt={row.original.requestedBy.username}
+              width={24}
+              height={24}
+              className="w-[24px] h-[24px] rounded-full"
+            />
+            <span className="ml-2">{row.original.requestedBy.displayName}</span>
+          </div>
+        </Link>
       </div>
     ),
   },

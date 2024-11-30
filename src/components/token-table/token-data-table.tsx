@@ -58,7 +58,7 @@ export function TokenDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
     {
-      id: "marketCap",
+      id: "createdAt",
       desc: true,
     },
   ]);
@@ -87,7 +87,7 @@ export function TokenDataTable<TData, TValue>({
       pagination: {
         pageSize: defaultPageSize,
       },
-      sorting: [{ id: "marketCap", desc: true }],
+      sorting: [{ id: "createdAt", desc: true }],
     },
   });
 
@@ -100,7 +100,7 @@ export function TokenDataTable<TData, TValue>({
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2 p-4">
       <div className="flex flex-col justify-between gap-1 py-1 sm:flex-row sm:items-center">
         <Input
           placeholder="Filter by token name..."
@@ -108,7 +108,7 @@ export function TokenDataTable<TData, TValue>({
           onChange={(event) =>
             table.getColumn("token")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm rounded-xl"
+          className="max-w-sm rounded-xl text-white"
         />
       </div>
       <div className="rounded-xl">
@@ -118,7 +118,7 @@ export function TokenDataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-white font-bold">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -146,7 +146,7 @@ export function TokenDataTable<TData, TValue>({
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-white">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -159,7 +159,7 @@ export function TokenDataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-white"
                 >
                   No results.
                 </TableCell>
@@ -169,7 +169,7 @@ export function TokenDataTable<TData, TValue>({
         </Table>
         <div className="flex items-center justify-between px-4 py-1">
           <div className="flex items-center space-x-6 lg:space-x-8">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 text-white">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -202,7 +202,7 @@ export function TokenDataTable<TData, TValue>({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+            <div className="flex w-[100px] items-center justify-center text-sm font-medium text-white">
               Page {table.getState().pagination.pageIndex + 1} of{" "}
               {table.getPageCount()}
             </div>
@@ -213,7 +213,7 @@ export function TokenDataTable<TData, TValue>({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to first page</span>
-                <ChevronsLeft className="h-4 w-4" />
+                <ChevronsLeft className="h-4 w-4" color="#ffffff" />
               </Button>
               <Button
                 className="h-8 w-8 p-0 rounded-xl"
@@ -221,7 +221,7 @@ export function TokenDataTable<TData, TValue>({
                 disabled={!table.getCanPreviousPage()}
               >
                 <span className="sr-only">Go to previous page</span>
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" color="#ffffff" />
               </Button>
               <Button
                 className="h-8 w-8 p-0 rounded-xl"
@@ -229,7 +229,7 @@ export function TokenDataTable<TData, TValue>({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to next page</span>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" color="#ffffff" />
               </Button>
               <Button
                 className="hidden h-8 w-8 p-0 lg:flex rounded-xl"
@@ -237,7 +237,7 @@ export function TokenDataTable<TData, TValue>({
                 disabled={!table.getCanNextPage()}
               >
                 <span className="sr-only">Go to last page</span>
-                <ChevronsRight className="h-4 w-4" />
+                <ChevronsRight className="h-4 w-4" color="#ffffff" />
               </Button>
             </div>
           </div>

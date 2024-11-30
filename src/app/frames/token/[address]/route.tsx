@@ -31,12 +31,7 @@ const frameHandler = frames(async (ctx) => {
     if (!token) {
       throw new Error("Token not found");
     }
-    const requestor = JSON.parse(token.requestedBy) as {
-      fid: number;
-      username: string;
-      displayName: string;
-      profileImage: string;
-    };
+    const requestor = token.requestedBy;
     return {
       image: (
         <BackgroundImage
@@ -48,7 +43,7 @@ const frameHandler = frames(async (ctx) => {
           <Container>
             <Column tw="my-auto mx-auto bg-black/75 text-white rounded-xl w-[800px] py-[20px]">
               <img
-                src={token.image || `${appURL()}/images/copy.png`}
+                src={token.image || `${appURL()}/images/default-token.jpg`}
                 tw="w-[760px] h-[760px] rounded-xl mx-auto"
                 alt={`Token ${token.name} logo`}
                 style={{
@@ -136,7 +131,7 @@ const frameHandler = frames(async (ctx) => {
           <Container>
             <Column tw="my-auto mx-auto bg-black/75 text-white rounded-xl w-[800px] py-[20px]">
               <img
-                src={`${appURL()}/images/copy.png`}
+                src={`${appURL()}/images/default-token.jpg`}
                 tw="w-[760px] h-[760px] rounded-xl mx-auto"
                 alt={`Token not found logo`}
                 style={{

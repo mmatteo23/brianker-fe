@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex flex-col w-full h-screen gap-2 mx-auto">
+        <div className="flex flex-col w-full mx-auto bg-[#28213c] text-white">
           <Providers>
             <Navbar />
             <main className="min-h-screen items-center justify-center text-zinc-950">

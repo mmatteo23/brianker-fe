@@ -58,23 +58,8 @@ const ERC20_ABI = [
 ] as const;
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-
-type TokenWithRequestor = {
-  id: number;
-  name: string;
-  ticker: string;
-  image: string;
-  requestedBy: {
-    fid: number;
-    username: string;
-    displayName: string;
-    profileImage: string;
-  };
-  address: string;
-  dateTime: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
+import { TokenWithRequestor } from "@/utils/db";
+import { Badge } from "./ui/badge";
 
 export const TokenDetails = ({
   token,
@@ -331,7 +316,7 @@ export const TokenDetails = ({
           <div className="flex flex-col gap-2 bg-gray-900 p-2 rounded-xl w-full md:w-[60%]">
             <div className="flex flex-row gap-2">
               <Image
-                src={token.image || `/images/copy.png`}
+                src={token.image || `/images/default-token.jpg`}
                 alt={`${token.name} logo`}
                 className="w-[60px] h-[60px] rounded-lg object-contain"
                 width={60}
@@ -361,9 +346,6 @@ export const TokenDetails = ({
           <div className="flex gap-2 w-full md:w-[40%] flex-col-reverse md:flex-col">
             {authenticated ? (
               <>
-                {/* <span className="text-black">
-                  {`${new Date(token.dateTime)} > ${new Date(new Date().toUTCString())}`}
-                </span> */}
                 {token?.dateTime && isTradingAvailable && (
                   <div className="bg-red-500 text-red-200 p-4 rounded-xl mb-2 text-center">
                     Trading not yet available - opens at{" "}
@@ -375,14 +357,14 @@ export const TokenDetails = ({
                 >
                   <div className="flex flex-row gap-2 justify-between h-12">
                     <Button
-                      className={`w-1/2 ${zeroForOne ? "bg-blue-600" : "bg-slate-600"}`}
+                      className={`w-1/2 ${zeroForOne ? "bg-green-600" : "bg-slate-600"} hover:bg-green-700`}
                       onClick={handleBuy}
                       disabled={isTradingAvailable}
                     >
                       Buy
                     </Button>
                     <Button
-                      className={`w-1/2 ${!zeroForOne ? "bg-blue-600" : "bg-slate-600"}`}
+                      className={`w-1/2 ${!zeroForOne ? "bg-red-600" : "bg-slate-600"} hover:bg-red-700`}
                       onClick={handleSell}
                       disabled={isTradingAvailable}
                     >
@@ -391,55 +373,81 @@ export const TokenDetails = ({
                   </div>
 
                   <div className="flex flex-col gap-2 mt-4">
-                    <div className="flex flex-col gap-2">
-                      <div className="w-full bg-slate-300 flex items-center rounded-md">
-                        <span className="text-gray-500 pl-3">
-                          {zeroForOne ? "ETH" : token?.ticker}
-                        </span>
+                    <div className="flex flex-col">
+                      <div className="w-full bg-transparent text-white flex items-center rounded-md h-[40px] gap-2">
                         <Input
                           type="text"
-                          placeholder="Enter price"
+                          placeholder="0"
                           value={inputPrice}
                           onChange={handlePriceChange}
-                          className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-1"
+                          className="bg-transparent text-3xl md:text-4xl text-white font-bold border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           disabled={isTradingAvailable}
                         />
-                        <span className="text-sm text-gray-500 pr-3 min-w-[200px] text-right whitespace-nowrap">
-                          Balance: {Number(currentBalance).toFixed(4)}{" "}
-                          {zeroForOne ? "ETH" : token?.ticker}
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className="bg-slate-800 text-xl w-fit">
+                            {zeroForOne ? "ETH" : token?.ticker}
+                          </Badge>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-300 min-w-[200px] text-right whitespace-nowrap">
+                        Balance: {Number(currentBalance).toFixed(4)}{" "}
+                        {zeroForOne ? "ETH" : token?.ticker}
+                        <Button
+                          variant="ghost"
+                          className="text-sm p-0 text-indigo-600 font-bold ml-2 hover:bg-transparent hover:text-indigo-500"
+                          onClick={() => {
+                            setInputPrice(
+                              zeroForOne
+                                ? Number(currentBalance).toFixed(8)
+                                : Number(tokenBalance || "0").toFixed(8),
+                            );
+                            setParsedInput(
+                              parseEther(
+                                zeroForOne
+                                  ? currentBalance
+                                  : tokenBalance?.toString() || "0",
+                              ).toString(),
+                            );
+                          }}
+                        >
+                          Max
+                        </Button>
+                      </p>
+                      <p className="text-lg text-center">
+                        Swapping you will receive{" "}
+                        <span className="text-indigo-400 font-bold">
+                          {zeroForOne ? token?.ticker : "ETH"}
                         </span>
-                      </div>
-                      <div className="bg-slate-300 p-2 rounded-md">
-                        <p className="text-lg">
-                          {zeroForOne ? token?.ticker : "ETH"} {displayPrice}
-                        </p>
-                      </div>
+                        {/* {displayPrice} */}
+                      </p>
                     </div>
 
                     <Button
                       onClick={handleSwap}
                       disabled={isSwapDisabled || isTradingAvailable}
-                      className="w-full mt-2"
+                      className="w-full mt-2 bg-indigo-600 hover:bg-indigo-700"
                     >
                       {isSwapPending || isSwapConfirming
                         ? "Processing..."
                         : "Execute Swap"}
                     </Button>
-
-                    {/* <Button onClick={logout} className="w-full">
-                      Disconnect Wallet
-                    </Button> */}
                   </div>
                 </div>
               </>
             ) : (
-              <Button onClick={login} className="w-full">
+              <Button
+                onClick={login}
+                className="w-full bg-indigo-600 hover:bg-indigo-700"
+              >
                 Connect Wallet
               </Button>
             )}
 
             <div className="flex flex-col bg-gray-900 rounded-xl p-2">
-              <p className="text-2xl font-bold mb-4">Token Info</p>
+              <p className="text-2xl font-bold mb-4 text-center my-4">
+                Token Info
+              </p>
+              <hr className="border-gray-700 mb-4" />
               <div className="flex flex-row gap-4 justify-between">
                 <div className="flex flex-col w-1/2">
                   <p className="text-lg text-indigo-400 font-bold">Created</p>
@@ -501,6 +509,49 @@ export const TokenDetails = ({
                   </p>
                   <p className="text-lg">{"$1M"}</p>
                 </div>
+              </div>
+              <div className="flex flex-col gap-4 justify-between my-4">
+                <div className="flex flex-row gap-2 w-full">
+                  <Link href={`/token/${token.id}`} className="w-1/2">
+                    <Button
+                      className="bg-indigo-600 hover:bg-indigo-700 w-full"
+                      size="lg"
+                    >
+                      Share
+                    </Button>
+                  </Link>
+                  <Link
+                    href={`https://base-sepolia.blockscout.com/token/${token.address}`}
+                    target="_blank"
+                    className="w-1/2"
+                  >
+                    <Button
+                      className="bg-indigo-600 hover:bg-indigo-700 w-full"
+                      size="lg"
+                    >
+                      Explorer
+                    </Button>
+                  </Link>
+                </div>
+                <Button
+                  className="w-full bg-gray-700 hover:bg-gray-800 py-[1.8em] font-bold"
+                  onClick={(e) => {
+                    const element = e.currentTarget;
+                    navigator.clipboard.writeText(token.address);
+                    element.innerText = "Copied!";
+                    setTimeout(() => {
+                      if (element) {
+                        element.innerText = `${token.address.slice(
+                          0,
+                          5,
+                        )}...${token.address.slice(token.address.length - 4)} (Click to Copy)`;
+                      }
+                    }, 1500);
+                  }}
+                >
+                  {`${token.address.slice(0, 5)}...${token.address.slice(token.address.length - 4)}`}{" "}
+                  (Click to Copy)
+                </Button>
               </div>
             </div>
           </div>
