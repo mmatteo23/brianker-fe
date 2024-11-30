@@ -77,10 +77,6 @@ export const TokenDetails = ({
   const [isLoading, setIsLoading] = useState(false);
   const [txStatus, setTxStatus] = useState<TransactionStatus>(null);
 
-  console.log({
-    token,
-  });
-
   const {
     data: swapTxHash,
     writeContract: swap,
@@ -126,11 +122,7 @@ export const TokenDetails = ({
     args: [address as `0x${string}`, SwapRouterAddress as `0x${string}`],
   });
 
-  console.log({
-    ethBalance,
-    tokenBalance,
-    allowanceResult,
-  });
+  console.log("displayPrice", displayPrice);
 
   // Handle transaction status updates
   useEffect(() => {

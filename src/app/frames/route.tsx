@@ -3,7 +3,7 @@ import { Button } from "frames.js/next";
 import { frames } from "./frames";
 import { appURL } from "../../utils/frames";
 
-const frameHandler = frames(async (ctx) => {
+const frameHandler = frames(async () => {
   return {
     image: (
       <div tw="flex flex-col">
