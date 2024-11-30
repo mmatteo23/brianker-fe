@@ -13,8 +13,8 @@ const { data, success, error } = envSchema.safeParse(process.env);
 if (!success) {
   console.error(
     `An error has occurred while parsing environment variables:${error.errors.map(
-      (e) => ` ${e.path.join(".")} is ${e.message}`
-    )}`
+      (e) => ` ${e.path.join(".")} is ${e.message}`,
+    )}`,
   );
   process.exit(1);
 }

@@ -61,6 +61,19 @@ import Link from "next/link";
 import { TokenWithRequestor } from "@/utils/db";
 import { Badge } from "./ui/badge";
 
+function warpcastSharableURL(token: TokenWithRequestor) {
+  let sharableText = `watch this out! This token is so hot 🔥\n\nToken:\n- ${token.ticker} (${token.name})\n- requested by @${token.requestedBy.username}\n${token.createdAt && `- created ${formatDistanceToNow(new Date(token.createdAt))} ago (${new Date(token.createdAt).toLocaleString()})`}\n- tradable from: ${formatDistanceToNow(new Date(token.dateTime))}\n\nmore details here 👇🏼`;
+  let sharableTextUriEncoded = "";
+  try {
+    sharableTextUriEncoded = encodeURI(sharableText);
+  } catch (e) {
+    sharableTextUriEncoded = encodeURI(
+      "new token created! check it out on https://brianker.vercel.app",
+    );
+  }
+  return `https://warpcast.com/~/compose?text=${sharableTextUriEncoded}&embeds[]=${process.env.APP_URL}/frames/token/${token.address}`;
+}
+
 export const TokenDetails = ({
   token,
 }: {
@@ -504,7 +517,11 @@ export const TokenDetails = ({
               </div>
               <div className="flex flex-col gap-4 justify-between my-4">
                 <div className="flex flex-row gap-2 w-full">
-                  <Link href={`/token/${token.id}`} className="w-1/2">
+                  <Link
+                    href={warpcastSharableURL(token)}
+                    className="w-1/2"
+                    target="_blank"
+                  >
                     <Button
                       className="bg-indigo-600 hover:bg-indigo-700 w-full"
                       size="lg"
