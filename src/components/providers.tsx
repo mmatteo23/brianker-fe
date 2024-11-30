@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider } from "@privy-io/wagmi";
 import { wagmiConfig } from "@/lib/wagmi";
-import { sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
@@ -21,8 +21,8 @@ const privyConfig: PrivyClientConfig = {
     accentColor: "#676FFF",
     showWalletLoginFirst: true,
   },
-  defaultChain: sepolia,
-  supportedChains: [sepolia],
+  defaultChain: baseSepolia,
+  supportedChains: [baseSepolia],
 };
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
